@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,3 +15,7 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::resource('users', 'UserController');
+Route::resource('profils', 'ProfilController');
+
