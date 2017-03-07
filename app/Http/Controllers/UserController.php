@@ -21,9 +21,12 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        $array = array();
         $profils = new Profils();
-        $profils = $profils->all();
-        return response()->json($profils, 200);
+        $profil = $profils->all();
+        $array['profils'] = $profil;
+        $array['count'] = $profils->count();
+        return response()->json($array, 200);
     }
 
 
