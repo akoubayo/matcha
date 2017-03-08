@@ -32,6 +32,9 @@ class Model
         if (!empty($offset) && (int)$offset >= 0) {
             $offset = " OFFSET " . (int)$offset;
         }
+        $limit = ($limit === 0) ? "" : $limit;
+        $offset = ($offset === 0) ? "" : $offset;
+        $order = ($order === "desc" || $order == "asc") ? $order : "desc";
         $this->req = 'SELECT * FROM ' . $this->table . " ORDER BY id_" . $this->table . ' ' . $order . $limit . $offset ;
         return $req = $this->get();
     }
@@ -67,6 +70,8 @@ class Model
         $req = 'INSERT INTO ' . $this->table . '(';
         $val = 'VALUES(';
         $array = array();
+        $req .= 'created_at, updated_at, ';
+        $val .= 'now(), now(), ';
         foreach ($this->champs as $value) {
             if (isset($this->$value) && !empty($this->$value)) {
                 $req .= $value . ', ';
@@ -86,9 +91,10 @@ class Model
     {
         $this->req = 'UPDATE ' . $this->table . ' SET ';
         $idTable = 'id_' . $this->table;
+        $this->req .= ' updated_at = now() , ';
         $this->array = array();
         foreach ($this->champs as $value) {
-            if (isset($this->$value) && !empty($this->$value)) {
+            if (isset($this->$value) && ((!empty($this->$value)) || ($this->$value === 0)) && $value != "updated_at") {
                 $this->req .= $value . ' = :' . $value . ', ';
                 $this->array[$value] = $this->$value;
             }
@@ -248,9 +254,9 @@ class Model
         return $this;
     }
 
-    public function offset($offset)
+    public function offset($off=10)
     {
-        $this->req .= ' OFFSET ' . $offset;
+        $this->req .= ' OFFSET ' . $off;
         return $this;
     }
     public function count($option = false)

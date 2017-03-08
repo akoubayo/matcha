@@ -16,6 +16,18 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/test', 'UserController@test');
+Route::post('/test', 'UserController@test');
 Route::resource('users', 'UserController');
 Route::resource('profils', 'ProfilController');
+Route::resource('photos', 'PhotoController');
+
+Route::get('images/{filename}', function ($filename)
+{
+     $path = storage_path() . '/app/images/'.$filename;
+     if(!File::exists($path)) return;
+    return Image::make($path)->response();
+
+    return $response;
+});
 

@@ -11,7 +11,7 @@ class UserController extends Controller
 {
     public function __construct(Request $request)
     {
-        $this->middleware('auth:api')->except('store');
+        $this->middleware('auth:api')->except('store', 'test');
     }
 
     /**
@@ -28,7 +28,6 @@ class UserController extends Controller
         $array['count'] = $profils->count();
         return response()->json($array, 200);
     }
-
 
     public function me(Request $request)
     {

@@ -17,9 +17,18 @@ class ProfilController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+
+    public function index(Request $request)
     {
-        echo 'toto';
+        $array = array();
+        $profils = new Profils();
+        $profil = $profils->all();
+        foreach ($profil as $key => $value) {
+            $value->photo = $value->photoUser();
+        }
+        $array['profils'] = $profil;
+        $array['count'] = $profils->count();
+        return response()->json($array, 200);
     }
 
     /**
@@ -42,6 +51,18 @@ class ProfilController extends Controller
     {
     }
 
+    public function me(Request $request)
+    {
+        $me = $request->user();
+        $profil = new Profils();
+        $profil = $profil->where([['users_id', '=', $me->id]])->get();
+        if (count($profil) == 1) {
+                $profil[0]->photo = $profil[0]->photoUser();
+                $profil[0]->nbPhoto = count($profil[0]->photo);
+        }
+        return response()->json($profil, 200);
+    }
+
     /**
      * Display the specified resource.
      *
@@ -49,8 +70,18 @@ class ProfilController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, Request $req)
     {
+        if ($id == "me") {
+            return $this->me($req);
+        } else {
+            $profil = new Profils();
+            $profil = $profil->where([['users_id', '=', $id]])->get();
+            if (count($profil) == 1) {
+                $profil[0]->photo = $profil[0]->photoUser();
+            }
+            return response()->json($profil, 200);
+        }
     }
 
     /**
@@ -77,7 +108,6 @@ class ProfilController extends Controller
         $me = $request->user();
         $profils = new Profils($me->id);
         $ret = $profils->updateProfil($request);
-
         return Response()->json($ret, 200);
     }
 

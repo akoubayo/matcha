@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\User;
 use App\Model\Profils;
+use App\Lib\RequestController;
 
 class User extends Authenticatable
 {
@@ -43,16 +44,20 @@ class User extends Authenticatable
 
     public function testNewUser(Request $req)
     {
+        $sexe = (int)RequestController::control($req->sexe);
+        if ($sexe != 1 && $sexe != 2) {
+            return ["sexe" => "invalid"];
+        }
         $test = DB::table('users')
-                    ->where('pseudo', $req->pseudo)
-                    ->orWhere('email', $req->email)
+                    ->where('pseudo',RequestController::control($req->pseudo))
+                    ->orWhere('email', RequestController::control($req->email))
                     ->get();
         $error = array();
         foreach ($test as $value) {
-            if ($value->pseudo == $req->pseudo) {
+            if (strtoupper($value->pseudo) == strtoupper(RequestController::control($req->pseudo))) {
                 $error['pseudo'] = "exist";
             }
-            if ($value->email == $req->email) {
+            if (strtoupper($value->email) == strtoupper(RequestController::control($req->email))) {
                 $error['email'] = "exist";
             }
         }
@@ -64,14 +69,14 @@ class User extends Authenticatable
         $new = $this->testNewUser($req);
         if (count($new) == 0) {
             $new = new User();
-            $new->name = $req->name;
-            $new->email = $req->email;
+            $new->name = RequestController::control($req->name);
+            $new->email = RequestController::control($req->email);
             $new->password = bcrypt($req->password);
-            $new->pseudo = $req->pseudo;
-            $new->first_name = $req->first_name;
+            $new->pseudo = RequestController::control($req->pseudo);
+            $new->first_name = RequestController::control($req->input('first_name'));
             $new->save();
             $profil = new Profils($new);
-            $new = $profil->createProfil($new);
+            $new = $profil->createProfil($new,$req);
         }
         return $new;
     }
