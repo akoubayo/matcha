@@ -47,7 +47,6 @@ class likesController extends Controller
             $profil = new Profils();
             $profil = $profil->where([['users_id', '=', $me->id]])->get();
             if(count($profil) > 0) {
-                echo $me->id;
                 $newLikes = new Likes();
                 $ret = $newLikes->saveLikes((int)$request->id, $profil[0]->id_profils);
                 return Response()->json($ret);

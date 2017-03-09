@@ -2,6 +2,7 @@
 namespace App\Model;
 
 use Illuminate\Http\Request;
+use App\Model\Photos;
 
 /**
 *
@@ -15,6 +16,14 @@ class Likes extends Model
     {
         if ((int)$id === 0 || (int)$visitor === 0 || (int)$id === (int)$visitor) {
             return array('error' => 'An error as occured');
+        }
+        $checkPhoto = new Photos();
+        $checkPhoto = $checkPhoto->where([['profils_id', '=', $visitor], ['sup', '=', 0]])
+                                ->limit(1)
+                                ->offset(0)
+                                ->get();
+        if (count($checkPhoto) == 0) {
+            return array('error' => 'You must have one picture on your profil');
         }
         $check = $this->where([
                                   [
