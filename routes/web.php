@@ -21,6 +21,8 @@ Route::post('/test', 'UserController@test');
 Route::resource('users', 'UserController');
 Route::resource('profils', 'ProfilController');
 Route::resource('photos', 'PhotoController');
+Route::resource('likes', 'LikesController');
+Route::resource('shows', 'ShowsController');
 
 Route::get('images/{filename}', function ($filename)
 {

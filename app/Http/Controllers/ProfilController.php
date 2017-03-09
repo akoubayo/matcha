@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Model\Profils;
 use Illuminate\Http\Response;
+use App\Model\Likes;
+use App\Model\Shows;
 
 class ProfilController extends Controller
 {
@@ -25,6 +27,7 @@ class ProfilController extends Controller
         $profil = $profils->all();
         foreach ($profil as $key => $value) {
             $value->photo = $value->photoUser();
+            $value->likes = count($value->likes());
         }
         $array['profils'] = $profil;
         $array['count'] = $profils->count();
@@ -59,6 +62,7 @@ class ProfilController extends Controller
         if (count($profil) == 1) {
                 $profil[0]->photo = $profil[0]->photoUser();
                 $profil[0]->nbPhoto = count($profil[0]->photo);
+                $profil[0]->likes = count($profil[0]->likes());
         }
         return response()->json($profil, 200);
     }
@@ -76,9 +80,21 @@ class ProfilController extends Controller
             return $this->me($req);
         } else {
             $profil = new Profils();
-            $profil = $profil->where([['users_id', '=', $id]])->get();
+            $profil = $profil->where([['id_profils', '=', $id]])->get();
             if (count($profil) == 1) {
+                $me = $req->user();
                 $profil[0]->photo = $profil[0]->photoUser();
+                $addLike = new Likes();
+                $showlike = $profil[0]->likes();
+                $profil[0]->nbLikes = count($showlike);
+                $profil[0]->likes = $showlike;
+                $profil[0]->visitorLikes = $addLike->visitorLikes($showlike);
+                $addshow = new shows();
+                $addshow->saveShows($profil[0]->id_profils, $me->id);
+                $showlike = $profil[0]->shows();
+                $profil[0]->nbshows = count($showlike);
+                $profil[0]->shows = $showlike;
+                $profil[0]->visitorshows = $addshow->visitorShows($showlike);
             }
             return response()->json($profil, 200);
         }

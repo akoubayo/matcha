@@ -9,7 +9,7 @@ use App\Lib\RequestController;
 class Profils extends Model
 {
     protected $table = 'profils';
-    protected $champs = array('id_profils','created_at','updated_at','description', 'sexe', 'orientation', 'cheveux', 'yeux', 'poid', 'taille', 'users_id', 'pseudo', 'mail', 'nom', 'prenom', 'birthday','lat','lon', 'ville');
+    protected $champs = array('id_profils','created_at','updated_at','description', 'sexe', 'orientation', 'cheveux', 'yeux', 'poid', 'taille', 'users_id', 'pseudo', 'prenom', 'birthday','lat','lon', 'ville');
 
     public function __construct($id = null)
     {
@@ -26,6 +26,16 @@ class Profils extends Model
     public function photos($option = false)
     {
         return $this->hasMany('App\Model\Photos', 'profils_id', $option);
+    }
+
+    public function likes($option = false)
+    {
+        return $this->hasMany('App\Model\Likes', 'profils_id', $option);
+    }
+
+    public function shows($option = false)
+    {
+        return $this->hasMany('App\Model\Shows', 'profils_id', $option);
     }
 
     public function createVar(Profils $profils)

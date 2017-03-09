@@ -59,7 +59,7 @@ class PhotoController extends Controller
         $profils = new profils($me->id);
         $newPhoto = new Photos($profils->id_profils);
         $count = $newPhoto->countImg();
-        if ($count < 5) {
+        if ($count < 50) {
             $profil = ((int)$count === 0) ? true : false;
             $new = $newPhoto->saveImg($request, $profil);
             return Response()->json($new, 200);

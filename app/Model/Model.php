@@ -39,9 +39,10 @@ class Model
         return $req = $this->get();
     }
 
-    public function select()
+    public function select($table = false)
     {
-        $this->req = 'SELECT * FROM ' . $this->table;
+        $table = ($table === false) ? $this->table : $table;
+        $this->req = 'SELECT * FROM ' . $table;
         return $this;
     }
 
@@ -134,8 +135,13 @@ class Model
             $this->req .= " OR ";
         }
         foreach ($data as $value) {
-            $this->req .= $value[0] . " " . $value[1] . " :" .$value[0] . " OR ";
-            $this->array[$value[0]] = $value[2];
+            if(isset($this->array[$value[0]])) {
+                $check = $value[0].count($this->array);
+            } else {
+                $check = $value[0];
+            }
+            $this->req .= $value[0] . " " . $value[1] . " :" .$check . " OR ";
+            $this->array[$check] = $value[2];
         }
         $this->req = substr($this->req, 0, -3);
         return $this;
