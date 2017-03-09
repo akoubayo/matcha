@@ -22,7 +22,7 @@ class CreateProfilTable extends Migration
             $table->integer('cheveux');
             $table->integer('yeux');
             $table->integer('poid');
-            $table->integer('taille');
+            $table->float('taille',3,2);
             $table->integer('users_id');
             $table->string('pseudo');
             $table->string('mail');

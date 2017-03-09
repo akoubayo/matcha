@@ -107,6 +107,16 @@ class Model
         $this->array = array();
     }
 
+    public function whereSpecial($value)
+    {
+        if(isset($this->array[$value[1]])) {
+            $check = $value[1].count($this->array);
+        } else {
+            $check = $value[1];
+        }
+        $this->req .= $value[0]. " " .$value[1] . " " . $value[2] . " :" .$check . ' ' . $value[4];
+        $this->array[$check] = $value[3];
+    }
     public function where($data)
     {
         if ($this->req == '') {
@@ -118,10 +128,22 @@ class Model
             $this->req .= " AND ";
         }
         foreach ($data as $value) {
-            $this->req .= $value[0] . " " . $value[1] . " :" .$value[0] . " AND ";
-            $this->array[$value[0]] = $value[2];
+
+            if (count($value) === 3) {
+                if(isset($this->array[$value[0]])) {
+                    $check = $value[0].count($this->array);
+                } else {
+                    $check = $value[0];
+                }
+                $this->req .= $value[0] . " " . $value[1] . " :" .$check . " AND ";
+                $this->array[$check] = $value[2];
+            } else {
+                $this->whereSpecial($value);
+            }
         }
-        $this->req = substr($this->req, 0, -4);
+        if (substr($this->req, -4) == "AND ") {
+            $this->req = substr($this->req, 0, -4);
+        }
         return $this;
     }
 
@@ -205,10 +227,12 @@ class Model
         $this->foreing_col = substr($col, 0, -2);
     }
 
-    public function hasMany($related, $foreignKey, $option = false)
+    public function hasMany($related, $foreignKey, $option = false, $foreignTable = null)
     {
-        $foreignTable = explode('\\', $related);
-        $foreignTable = strtolower($foreignTable[(count($foreignTable) - 1)]);
+        if ($foreignTable === null) {
+            $foreignTable = explode('\\', $related);
+            $foreignTable = strtolower($foreignTable[(count($foreignTable) - 1)]);
+        }
         $id = 'id_' . $this->table;
         $this->foreignClass = $related;
         $this->foreignKey = $foreignKey;
@@ -248,9 +272,9 @@ class Model
     {
         $this->req .= ' ORDER BY ';
         foreach ($data as $value) {
-                $this->req .= $value[0] . " " . $value[1] . " AND ";
+                $this->req .= $value[0] . " " . $value[1] . " , ";
         }
-        $this->req = substr($this->req, 0, -4);
+        $this->req = substr($this->req, 0, -2);
         return $this;
     }
 

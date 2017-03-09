@@ -42,6 +42,9 @@ class Shows extends Model
         }
         $this->foreignClass = 'App\Model\Profils';
         $ret = $this->select("profils")->whereOr($array)->get();
+        if (count($ret) > 0) {
+            $ret[0]->getProfil($ret, null, true);
+        }
         return $ret;
     }
 }

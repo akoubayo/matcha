@@ -23,6 +23,7 @@ Route::resource('profils', 'ProfilController');
 Route::resource('photos', 'PhotoController');
 Route::resource('likes', 'LikesController');
 Route::resource('shows', 'ShowsController');
+Route::resource('tags', 'TagsController');
 
 Route::get('images/{filename}', function ($filename)
 {

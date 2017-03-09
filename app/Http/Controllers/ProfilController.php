@@ -22,16 +22,21 @@ class ProfilController extends Controller
 
     public function index(Request $request)
     {
-        $array = array();
+  //      $array = array("error" => "An error as occured");
+        $me = $request->user();
         $profils = new Profils();
-        $profil = $profils->all();
-        foreach ($profil as $key => $value) {
-            $value->photo = $value->photoUser();
-            $value->likes = count($value->likes());
+        $profil = $profils->where([['users_id', '=', $me->id]])->get();
+        if (count($profil) === 1) {
+            $array = $profils->getAllProfil($request, $profil[0]);
         }
-        $array['profils'] = $profil;
-        $array['count'] = $profils->count();
-        return response()->json($array, 200);
+
+
+        // $profils = new Profils();
+        // $profil = $profils->all();
+        // $profils->getProfil($profil, null);
+        // $array['profils'] = $profil;
+        // $array['count'] = $profils->count();
+        return Response()->json($array, 200);
     }
 
     /**
@@ -54,17 +59,22 @@ class ProfilController extends Controller
     {
     }
 
-    public function me(Request $request)
+    public function me(Request $request, $response = true)
     {
         $me = $request->user();
         $profil = new Profils();
         $profil = $profil->where([['users_id', '=', $me->id]])->get();
         if (count($profil) == 1) {
-                $profil[0]->photo = $profil[0]->photoUser();
-                $profil[0]->nbPhoto = count($profil[0]->photo);
-                $profil[0]->likes = count($profil[0]->likes());
+            $profil[0]->getProfil($profil, null);
+            if ($response === true) {
+                return response()->json($profil, 200);
+            }
+            return $profil;
         }
-        return response()->json($profil, 200);
+        if ($response === true) {
+            return Response()->json(["error" => "An error as occured"]);
+        }
+        return array();
     }
 
     /**
@@ -83,18 +93,8 @@ class ProfilController extends Controller
             $profil = $profil->where([['id_profils', '=', $id]])->get();
             if (count($profil) == 1) {
                 $me = $req->user();
-                $profil[0]->photo = $profil[0]->photoUser();
-                $addLike = new Likes();
-                $showlike = $profil[0]->likes();
-                $profil[0]->nbLikes = count($showlike);
-                $profil[0]->likes = $showlike;
-                $profil[0]->visitorLikes = $addLike->visitorLikes($showlike);
-                $addshow = new shows();
-                $addshow->saveShows($profil[0]->id_profils, $me->id);
-                $showlike = $profil[0]->shows();
-                $profil[0]->nbshows = count($showlike);
-                $profil[0]->shows = $showlike;
-                $profil[0]->visitorshows = $addshow->visitorShows($showlike);
+                $me = $profil[0]->where([['users_id', '=', $me->id]])->get();
+                $profil[0]->getProfil($profil, $me[0]);
             }
             return response()->json($profil, 200);
         }
