@@ -3,7 +3,7 @@ namespace App\Model;
 
 use Illuminate\Http\Request;
 use App\Model\Photos;
-
+use App\Model\Notifs;
 /**
 *
 */
@@ -12,7 +12,7 @@ class Likes extends Model
     protected $table = 'likes';
     protected $champs = array('id_likes', 'created_at', 'updated_at', 'profils_id', 'visitor');
 
-    public function saveLikes($id, $visitor)
+    public function saveLikes($id, $visitor,$me)
     {
         if ((int)$id === 0 || (int)$visitor === 0 || (int)$id === (int)$visitor) {
             return array('error' => 'An error as occured');
@@ -43,8 +43,10 @@ class Likes extends Model
             $this->profils_id = $id;
             $this->visitor = $visitor;
             $this->save();
+            $newNotif = new notifs();
+            $newNotif->addNotifs($me, $verif[0], 'like');
         } else {
-            $check[0]->update();
+            //$check[0]->update();
         }
         return array('succes' => 'Likes is save');
     }

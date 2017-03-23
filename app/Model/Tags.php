@@ -24,10 +24,21 @@ class Tags extends Model
             if (count($exist) === 0) {
                 $this->name = ucfirst(mb_strtolower($name));
                 $newTag = $this->save();
-                return $add->addTaggable($profil->id_profils, $newTag->id_tags);
+                return $add->addTaggable($profil->id_profils, $newTag->id_tags, $newTag->name);
             } else {
-                return $add->addTaggable($profil->id_profils, $exist[0]->id_tags);
+                return $add->addTaggable($profil->id_profils, $exist[0]->id_tags, $exist[0]->name);
             }
+        }
+        return array("error" => "An error as occured");
+    }
+
+    public function deleteTags(Profils $profil, $id)
+    {
+        $exist = $this->where([['id_tags', '=', (int)$id]])->get();
+        if (count($exist) !== 0) {
+            echo 'toto';
+            $add = new TagTaggable();
+            return $add->deleteTaggable($profil->id_profils,(int)$id);
         }
         return array("error" => "An error as occured");
     }

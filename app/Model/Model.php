@@ -13,6 +13,7 @@ class Model
     private $req;
     private $array = array();
     private $debug = false;
+    private $delete = false;
 
     public function __construct()
     {
@@ -178,6 +179,10 @@ class Model
         $req->execute($this->array);
         $this->req = '';
         $this->array = array();
+        if ($this->delete === true) {
+            $this->delete = false;
+            return array();
+        }
         return $this->returnObject($req, get_class($this));
     }
 
@@ -302,6 +307,12 @@ class Model
             $this->array = array();
             return $ret['count'];
         }
+        return $this;
+    }
+    public function delete($table = false){
+        $this->delete = true;
+        $table = ($table === false) ? $this->table : $table;
+        $this->req = 'DELETE FROM ' . $table;
         return $this;
     }
 

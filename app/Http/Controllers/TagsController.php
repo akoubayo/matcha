@@ -94,8 +94,17 @@ class TagsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        //
+        $ret = array("error" => "An error as occured");
+        $me = $request->user();
+        $profil = new Profils();
+        $profil = $profil->where([['users_id', '=', $me->id]])->get();
+
+        if (count($profil) === 1 && $id) {
+            $tags = new Tags();
+            $ret = $tags->deleteTags($profil[0], $id);
+        }
+        return Response()->json($ret, 200);
     }
 }

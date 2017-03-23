@@ -18,14 +18,24 @@ class TagTaggable extends Model
         return $this->belongsTo('App\Model\Tags', 'id_tags', $option);
     }
 
-    public function addTaggable($profil, $tag)
+    public function addTaggable($profil, $tag, $tagName)
     {
         $exist = $this->where([['profils_id', '=', $profil], ['tags_id', '=', $tag]])->get();
         if (count($exist) === 0) {
             $this->profils_id = $profil;
             $this->tags_id = $tag;
             $this->save();
+            return array("id" => $tag, "name" => $tagName);
         }
-        return array("success" => "tags save");
+        return array();
+    }
+
+    public function deleteTaggable($profil, $tag) {
+        $exist = $this->where([['profils_id', '=', $profil], ['tags_id', '=', $tag]])->get();
+        if (count($exist) !== 0) {
+            $this->delete()
+                ->where([['tags_id', '=', $tag], ['profils_id', '=', $profil]])
+                ->get();
+        }
     }
 }

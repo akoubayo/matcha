@@ -145,7 +145,7 @@ class Photos extends Model
         }
     }
 
-    public function delete($src)
+    public function deletePhoto($src)
     {
         return;
     }

@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Lib\RequestController;
 use App\Model\Likes;
 use App\Model\Shows;
+use App\Model\Notifs;
 
 /**
 *
@@ -51,7 +52,7 @@ class Profils extends Model
         $tags = array();
         foreach ($taggables as $value) {
             $tag = $value->tags();
-            $tags[] = array("name" => $tag->name);
+            $tags[] = array("id" => $tag->id_tags,"name" => $tag->name);
         }
         return $tags;
     }
@@ -94,7 +95,7 @@ class Profils extends Model
         $query = @unserialize(file_get_contents('http://ip-api.com/php/'.$ip));
         if ($query && $query['status'] == 'success') {
             return $query;
-            echo 'Hello visitor from '.$query['country'].', '.$query['city'].'!';
+            //echo 'Hello visitor from '.$query['country'].', '.$query['city'].'!';
         }
         return array('lat' => 0, 'lon' => 0, 'city' => '');
     }
@@ -125,10 +126,18 @@ class Profils extends Model
 
     public function updateProfil(Request $request)
     {
-        $array = array('description', 'orientation', 'cheveux', 'yeux', 'poid', 'taille', 'birthday');
+        $array = array('description', 'orientation', 'cheveux', 'yeux', 'poid', 'taille', 'birthday', 'ville');
         foreach ($this->champs as $value) {
             if (in_array($value, $array) && !empty($request->input($value))) {
-                $this->$value = RequestController::control($request->input($value));
+                if ($value == 'yeux') {
+                    $this->$value = $this->updateYeux($request->input($value));
+                } else if($value == 'cheveux') {
+                    $this->$value = $this->updateCheveux($request->input($value));
+                } else if($value == 'orientation') {
+                    $this->$value = $this->updateOrientation($request->input($value));
+                } else {
+                    $this->$value = RequestController::control($request->input($value));
+                }
             }
         }
         $this->update();
@@ -193,7 +202,7 @@ class Profils extends Model
                         ->limit($this->limit)
                         ->offset($this->offset)
                         ->get();
-        $this->getProfil($profils, null, true);
+        $this->getProfil($profils);
         $ret['profils'] = $profils;
         $ret['nbProfil'] = $this->count(true)
                                 ->where($where)
@@ -219,6 +228,7 @@ class Profils extends Model
                 $this->getSexe($profil);
                 $this->getYeux($profil);
                 $this->orientation($profil);
+                //$this->description =  nl2br($this->description);
             }
         }
     }
@@ -237,6 +247,8 @@ class Profils extends Model
         $addshow = new shows();
         if ($me != null && $me->id_profils != $profil->id_profils) {
             $addshow->saveShows($profil->id_profils, $me->id_profils);
+            $newNotif = new notifs();
+            $newNotif->addNotifs($me,$profil,'visite');
         }
         $showlike = $profil->shows();
         $profil->nbshows = count($showlike);
@@ -289,9 +301,34 @@ class Profils extends Model
         }
     }
 
+    public function updateCheveux($profil)
+    {
+        switch (mb_strtolower($profil)) {
+            case 'brun':
+                $profil = 1;
+                break;
+            case 'blond':
+                $profil = 2;
+                break;
+            case 'roux':
+                $profil = 3;
+                break;
+            case 'chatain':
+                $profil = 4;
+                break;
+            case 'noir':
+                $profil = 5;
+                break;
+            default:
+                $profil = 0;
+                break;
+        }
+        return $profil;
+    }
+
     public function getYeux($profil)
     {
-        switch ($profil) {
+        switch ($profil->yeux) {
             case '1':
                 $profil->yeux = 'Bleu';
                 break;
@@ -310,6 +347,28 @@ class Profils extends Model
         }
     }
 
+    public function updateYeux($profil)
+    {
+        switch (mb_strtolower($profil)) {
+            case 'bleu':
+                $profil = 1;
+                break;
+            case 'marron':
+                $profil = 2;
+                break;
+            case 'vert':
+                $profil = 3;
+                break;
+            case 'gris':
+                $profil = 4;
+                break;
+            default:
+                $profil = 0;
+                break;
+        }
+        return $profil;
+    }
+
     public function orientation($profil)
     {
         switch ($profil->orientation) {
@@ -326,5 +385,24 @@ class Profils extends Model
                 $profil->orientation = 'Bisexuel';
                 break;
         }
+    }
+
+    public function updateOrientation($profil)
+    {
+        switch (mb_strtolower($profil)) {
+            case 'hétérosexuel':
+                $profil = 1;
+                break;
+            case 'homosexuel':
+                $profil = 2;
+                break;
+            case 'bisexuel':
+                $profil = 3;
+                break;
+            default:
+                $profil = 4;
+                break;
+        }
+        return $profil;
     }
 }

@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Model\Likes;
 use App\Model\Profils;
+use App\Model\Notifs;
 
-class likesController extends Controller
+class NotifsController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -42,17 +41,7 @@ class likesController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->id) {
-            $me = $request->user();
-            $profil = new Profils();
-            $profil = $profil->where([['users_id', '=', $me->id]])->get();
-            if(count($profil) > 0) {
-                $newLikes = new Likes();
-                $ret = $newLikes->saveLikes((int)$request->id, $profil[0]->id_profils, $profil[0]);
-                return Response()->json($ret);
-            }
-        }
-        return Response()->json(['error' => 'An error as occured']);
+        //
     }
 
     /**
@@ -61,9 +50,20 @@ class likesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        //
+        $user = $request->user();
+        $me = new Profils();
+        $me = $me
+        ->where([
+                    ["users_id", "=", $user->id]
+        ])
+        ->get();
+        if (count($me) === 1 && $id == 'me' || $id == $me->id_profils) {
+            $notif = new Notifs();
+            $ret = $notif->getNotifNonLu($me[0]->id_profils);
+            return Response()->json($ret, 200);
+        }
     }
 
     /**
