@@ -14,9 +14,9 @@ class AddLatANDaddLon extends Migration
     public function up()
     {
         Schema::table('profils', function (Blueprint $table) {
-            $table->double('lat');
-            $table->double('lon');
-            $table->string('ville');
+            $table->double('lat')->nullable();
+            $table->double('lon')->nullable();
+            $table->string('ville')->nullable();
         });
     }
 
@@ -30,7 +30,7 @@ class AddLatANDaddLon extends Migration
         Schema::table('profils', function (Blueprint $table) {
             $table->dropColumn('lat');
             $table->dropColumn('lon');
-            $table->dropColumn('lon');
+            $table->dropColumn('ville');
         });
     }
 }

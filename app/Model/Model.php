@@ -18,7 +18,7 @@ class Model
     public function __construct()
     {
         try {
-            $this->db = new PDO('mysql:host=localhost:8889;dbname=matcha;charset=utf8', 'root', 'root');
+            $this->db = new PDO('mysql:host=localhost;dbname=matcha;charset=utf8', 'root', 'root');
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
             $this->db->exec("SET CHARACTER SET utf8");
         } catch (Exception $e) {

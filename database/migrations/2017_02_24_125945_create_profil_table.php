@@ -16,19 +16,19 @@ class CreateProfilTable extends Migration
         Schema::create('profils', function (Blueprint $table) {
             $table->increments('id_profils');
             $table->timestamps();
-            $table->text('description');
-            $table->integer('sexe');
-            $table->integer('orientation');
-            $table->integer('cheveux');
-            $table->integer('yeux');
-            $table->integer('poid');
-            $table->float('taille',3,2);
-            $table->integer('users_id');
-            $table->string('pseudo');
-            $table->string('mail');
-            $table->string('nom');
-            $table->string('prenom');
-            $table->bigInteger('birthday');
+            $table->text('description')->nullable();
+            $table->integer('sexe')->nullable();
+            $table->integer('orientation')->nullable();
+            $table->integer('cheveux')->nullable();
+            $table->integer('yeux')->nullable();
+            $table->integer('poid')->nullable();
+            $table->float('taille',3,2)->nullable();
+            $table->integer('users_id')->nullable();
+            $table->string('pseudo')->nullable();
+            $table->string('mail')->nullable();
+            $table->string('nom')->nullable();
+            $table->string('prenom')->nullable();
+            $table->bigInteger('birthday')->nullable();
         });
     }
 
